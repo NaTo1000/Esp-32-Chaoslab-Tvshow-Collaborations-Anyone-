@@ -69,3 +69,6 @@ logs/
 # OS files
 Thumbs.db
 desktop.ini
+
+# CodeQL
+_codeql_detected_source_root
