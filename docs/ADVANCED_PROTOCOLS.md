@@ -459,7 +459,7 @@ See `examples/04-mesh-network/` for working code.
 - ESP-NOW Protocol: [Espressif Docs](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/network/esp_now.html)
 - LoRa: [LoRa Alliance](https://lora-alliance.org/)
 - Meshtastic: [meshtastic.org](https://meshtastic.org/)
-- RadioLib (Multi-protocol): [github.com/jgromes/RadioLib](https://github.com/jgromes/RadioLib)
+- RadioLib (Multi-protocol): [GitHub.com/jgromes/RadioLib](https://github.com/jgromes/RadioLib)
 
 ---
 

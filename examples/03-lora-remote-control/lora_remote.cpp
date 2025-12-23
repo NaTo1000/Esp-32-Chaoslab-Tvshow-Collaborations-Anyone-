@@ -46,7 +46,7 @@
 #define LORA_FREQUENCY 915E6
 
 // Configuration
-#define IS_TRANSMITTER true  // Set to false for receiver
+#define IS_TRANSMITTER true  // Set to false for receiver - MUST RECOMPILE after changing!
 #define LED_PIN 2
 
 // Message structure

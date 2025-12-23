@@ -383,7 +383,8 @@ void receivedCallback(uint32_t from, String &msg) {
 void setup() {
   Serial.begin(115200);
   
-  mesh.init(MESH_PREFIX, MESH_PASSWORD, MESH_PORT);
+  Scheduler userScheduler;
+  mesh.init(MESH_PREFIX, MESH_PASSWORD, &userScheduler, MESH_PORT);
   mesh.onReceive(&receivedCallback);
   
   // Announce presence
