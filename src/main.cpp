@@ -62,7 +62,7 @@ void handleRoot() {
   html += "</div>";
   html += "<div class='card'>";
   html += "<p>🔌 Device: ESP32</p>";
-  html += "<p>📡 IP: " + WiFi.localIP().toString() + "</p>";
+  html += "<p>📡 IP: " + WiFi.softAPIP().toString() + "</p>";
   html += "</div>";
   html += "</body></html>";
   
