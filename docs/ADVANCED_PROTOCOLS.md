@@ -221,21 +221,23 @@ void injectDecoy(uint32_t nodeId, int hops);
 int randomHops(int minHop, int maxHop);
 
 bool isForceSeek(const MeshPacket& pkt) {
-  return pkt.isRouteDiscovery() &&          // use your packet's route-discovery flag
+  return pkt.isRouteDiscovery() &&          // replace with your packet's route-discovery/header flag
          ((pkt.destination == BROADCAST_ID) || (pkt.hopLimit > SAFE_HOPS)) &&
          rateExceeded(pkt.source);          // track per-node discovery rate
 }
 
 void onMeshPacket(const MeshPacket& pkt) {
   if (isForceSeek(pkt)) {
-    mesh.quarantine(pkt.source);          // custom (implement): stop real forwarding
-    mesh.injectDecoy(pkt.source, randomHops(2, SAFE_HOPS)); // custom (implement): mirrored maze
+    quarantine(pkt.source);               // custom (implement): stop real forwarding
+    injectDecoy(pkt.source, randomHops(2, SAFE_HOPS)); // custom (implement): mirrored maze
     return;
   }
 
   mesh.forward(pkt); // normal path
 }
 ```
+
+When mapping to Meshtastic protobuf packets, use the routing header fields (e.g., `from`, `to`, `hop_limit`, and any discovery/route-request flags) to fill the `MeshPacket` members referenced above.
 
 Tuning knobs:
 - Track per-node query rates and reset on successful auth.

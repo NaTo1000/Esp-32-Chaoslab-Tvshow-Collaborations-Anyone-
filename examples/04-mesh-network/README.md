@@ -326,7 +326,7 @@ String signMessage(String msg) {
 Use when a node appears to be force-seeking addresses or probing routes:
 
 ```cpp
-// Conceptual pseudocode; replace custom helpers with your own Meshtastic wrappers
+// Conceptual pseudocode; Meshtastic does not ship these helpers—implement them in your firmware
 const int MAX_TRUSTED_HOPS = 6; // tighten for small/private meshes, loosen for long routes
 const String BROADCAST_DEST = "ALL"; // adjust to whatever your payload uses for broadcast
 
@@ -345,8 +345,8 @@ bool looksLikeForceSeek(uint32_t from, const String& dest, int hopLimit) {
 void receivedCallback(uint32_t from, String &msg) {
   // extractDest/extractHopLimit: parse your mesh payload metadata
   if (looksLikeForceSeek(from, extractDest(msg), extractHopLimit(msg))) {
-    mesh.quarantine(from);                         // custom extension (implement ACL/block logic)
-    mesh.injectDecoy(from, randomHops(2, MAX_TRUSTED_HOPS)); // custom extension (implement decoys)
+    quarantine(from);                              // custom extension (implement ACL/block logic)
+    injectDecoy(from, randomHops(2, MAX_TRUSTED_HOPS)); // custom extension (implement decoys)
     return;
   }
 
