@@ -321,6 +321,29 @@ String signMessage(String msg) {
 }
 ```
 
+### 4. Meshtastic Barrier + House-of-Mirrors Defense
+
+Use when a node appears to be force-seeking addresses or probing routes:
+
+```cpp
+bool looksLikeForceSeek(uint32_t from, const String& dest, int hopLimit) {
+  return (dest == "ALL" || hopLimit > 6) && rateExceeded(from);
+}
+
+void receivedCallback(uint32_t from, String &msg) {
+  if (looksLikeForceSeek(from, extractDest(msg), extractHopLimit(msg))) {
+    mesh.quarantine(from);                 // block real paths
+    mesh.injectDecoy(from, randomHops(2)); // send mirrored maze
+    return;
+  }
+
+  // normal handling
+}
+```
+
+- **Barrier**: quarantine or rate-limit the node and require re-auth.
+- **House-of-Mirrors**: return decoy topology so reconnaissance burns time while the real mesh stays hidden.
+
 ## 🐛 Troubleshooting
 
 ### Nodes not connecting

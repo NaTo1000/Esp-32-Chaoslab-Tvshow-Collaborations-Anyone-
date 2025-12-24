@@ -197,7 +197,39 @@ void loop() {
   
   delay(10000);
 }
+
+#### Meshtastic Defensive Pattern: Barrier + House-of-Mirrors
+
+Use this when a node appears to be force-seeking addresses or probing like a cyber attack:
+
+- **Detect**: Watch for rapid, repeated route discoveries, wildcard destinations, or join attempts from unknown IDs.
+- **Barrier**: Rate-limit or quarantine the suspicious node, refuse to forward its traffic, and require re-keying before it can rejoin.
+- **House-of-Mirrors**: Feed the actor decoy topology responses (fake hops, randomized backoff) so reconnaissance burns time while real nodes stay hidden.
+
+Pseudo-flow for a Meshtastic-style handler:
+
+```cpp
+bool isForceSeek(const MeshPacket& pkt) {
+  return pkt.isRouteDiscovery() &&
+         (pkt.destination == "ALL" || pkt.hopLimit > SAFE_HOPS) &&
+         rateExceeded(pkt.source);
+}
+
+void onMeshPacket(const MeshPacket& pkt) {
+  if (isForceSeek(pkt)) {
+    mesh.quarantine(pkt.source);          // stop real forwarding
+    mesh.injectDecoy(pkt.source, randomHops(2, 6)); // mirrored maze
+    return;
+  }
+
+  mesh.forward(pkt); // normal path
+}
 ```
+
+Tuning knobs:
+- Track per-node query rates and reset on successful auth.
+- Rotate decoy responses so patterns cannot be fingerprinted.
+- Pair with message signing to prevent spoofed “decoy complete” acks.
 
 ---
 
