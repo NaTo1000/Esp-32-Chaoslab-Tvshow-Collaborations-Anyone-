@@ -321,6 +321,42 @@ String signMessage(String msg) {
 }
 ```
 
+### 4. Meshtastic Barrier + House-of-Mirrors Defense
+
+Use when a node appears to be force-seeking addresses or probing routes:
+
+```cpp
+// Conceptual pseudocode; Meshtastic does not ship these helpers—implement them in your firmware
+const int MAX_TRUSTED_HOPS = 6; // tighten for small/private meshes, loosen for long routes
+const String BROADCAST_DEST = "ALL"; // adjust to whatever your payload uses for broadcast
+
+// Placeholder hooks to implement in firmware (custom wrappers; not base Meshtastic API)
+bool rateExceeded(uint32_t nodeId);
+String extractDest(const String& msg);
+int extractHopLimit(const String& msg);
+void quarantine(uint32_t nodeId);
+void injectDecoy(uint32_t nodeId, int hops);
+int randomHops(int minHop, int maxHop);
+
+bool looksLikeForceSeek(uint32_t from, const String& dest, int hopLimit) {
+  return (dest.equals(BROADCAST_DEST) || hopLimit > MAX_TRUSTED_HOPS) && rateExceeded(from);
+}
+
+void receivedCallback(uint32_t from, String &msg) {
+  // extractDest/extractHopLimit: parse your mesh payload metadata
+  if (looksLikeForceSeek(from, extractDest(msg), extractHopLimit(msg))) {
+    quarantine(from);                              // custom extension (implement ACL/block logic)
+    injectDecoy(from, randomHops(2, MAX_TRUSTED_HOPS)); // custom extension (implement decoys)
+    return;
+  }
+
+  // normal handling
+}
+```
+
+- **Barrier**: quarantine or rate-limit the node and require re-auth.
+- **House-of-Mirrors**: return decoy topology so reconnaissance burns time while the real mesh stays hidden.
+
 ## 🐛 Troubleshooting
 
 ### Nodes not connecting

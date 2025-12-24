@@ -199,6 +199,51 @@ void loop() {
 }
 ```
 
+#### Meshtastic Defensive Pattern: Barrier + House-of-Mirrors
+
+Use this when a node appears to be force-seeking addresses or probing like a cyber attack:
+
+- **Detect**: Watch for rapid, repeated route discoveries, wildcard destinations, or join attempts from unknown IDs.
+- **Barrier**: Rate-limit or quarantine the suspicious node, refuse to forward its traffic, and require re-keying before it can rejoin.
+- **House-of-Mirrors**: Feed the actor decoy topology responses (fake hops, randomized backoff) so reconnaissance burns time while real nodes stay hidden.
+
+Pseudo-flow for a Meshtastic-style handler:
+
+```cpp
+// Conceptual pseudocode using custom helper wrappers; map to your own Meshtastic packet fields
+const int SAFE_HOPS = 6; // tighten/loosen based on deployment risk
+const uint32_t BROADCAST_ID = 0xFFFFFFFF; // adjust to your mesh's broadcast constant
+
+// Placeholder hooks to implement in your firmware (not provided by Meshtastic core)
+bool rateExceeded(uint32_t nodeId);
+void quarantine(uint32_t nodeId);
+void injectDecoy(uint32_t nodeId, int hops);
+int randomHops(int minHop, int maxHop);
+
+bool isForceSeek(const MeshPacket& pkt) {
+  return pkt.isRouteDiscovery() &&          // replace with your packet's route-discovery/header flag
+         ((pkt.destination == BROADCAST_ID) || (pkt.hopLimit > SAFE_HOPS)) &&
+         rateExceeded(pkt.source);          // track per-node discovery rate
+}
+
+void onMeshPacket(const MeshPacket& pkt) {
+  if (isForceSeek(pkt)) {
+    quarantine(pkt.source);               // custom (implement): stop real forwarding
+    injectDecoy(pkt.source, randomHops(2, SAFE_HOPS)); // custom (implement): mirrored maze
+    return;
+  }
+
+  mesh.forward(pkt); // normal path
+}
+```
+
+When mapping to Meshtastic protobuf packets, use the routing header fields (e.g., `from`, `to`, `hop_limit`, and any discovery/route-request flags) to fill the `MeshPacket` members referenced above.
+
+Tuning knobs:
+- Track per-node query rates and reset on successful auth.
+- Rotate decoy responses so patterns cannot be fingerprinted.
+- Pair with message signing to prevent spoofed “decoy complete” acks.
+
 ---
 
 ### 4. BLE Mesh: Bluetooth Mesh Networking
