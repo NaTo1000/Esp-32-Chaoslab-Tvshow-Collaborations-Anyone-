@@ -197,6 +197,7 @@ void loop() {
   
   delay(10000);
 }
+```
 
 #### Meshtastic Defensive Pattern: Barrier + House-of-Mirrors
 
@@ -212,7 +213,7 @@ Pseudo-flow for a Meshtastic-style handler:
 bool isForceSeek(const MeshPacket& pkt) {
   return pkt.isRouteDiscovery() &&
          (pkt.destination == "ALL" || pkt.hopLimit > SAFE_HOPS) &&
-         rateExceeded(pkt.source);
+         rateExceeded(pkt.source); // track per-node discovery rate
 }
 
 void onMeshPacket(const MeshPacket& pkt) {

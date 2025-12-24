@@ -326,11 +326,14 @@ String signMessage(String msg) {
 Use when a node appears to be force-seeking addresses or probing routes:
 
 ```cpp
+const int MAX_TRUSTED_HOPS = 6; // tighten/loosen based on deployment
+
 bool looksLikeForceSeek(uint32_t from, const String& dest, int hopLimit) {
-  return (dest == "ALL" || hopLimit > 6) && rateExceeded(from);
+  return (dest == "ALL" || hopLimit > MAX_TRUSTED_HOPS) && rateExceeded(from);
 }
 
 void receivedCallback(uint32_t from, String &msg) {
+  // extractDest/extractHopLimit: parse your mesh payload metadata
   if (looksLikeForceSeek(from, extractDest(msg), extractHopLimit(msg))) {
     mesh.quarantine(from);                 // block real paths
     mesh.injectDecoy(from, randomHops(2)); // send mirrored maze
