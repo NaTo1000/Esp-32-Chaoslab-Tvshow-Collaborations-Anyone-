@@ -214,7 +214,7 @@ Pseudo-flow for a Meshtastic-style handler:
 const int SAFE_HOPS = 6; // tighten/loosen based on deployment risk
 const uint32_t BROADCAST_ID = 0xFFFFFFFF; // adjust to your mesh's broadcast constant
 
-// Placeholder hooks to implement in your firmware
+// Placeholder hooks to implement in your firmware (not provided by Meshtastic core)
 bool rateExceeded(uint32_t nodeId);
 void quarantine(uint32_t nodeId);
 void injectDecoy(uint32_t nodeId, int hops);
@@ -228,8 +228,8 @@ bool isForceSeek(const MeshPacket& pkt) {
 
 void onMeshPacket(const MeshPacket& pkt) {
   if (isForceSeek(pkt)) {
-    mesh.quarantine(pkt.source);          // custom: stop real forwarding
-    mesh.injectDecoy(pkt.source, randomHops(2, SAFE_HOPS)); // custom: mirrored maze
+    mesh.quarantine(pkt.source);          // custom (implement): stop real forwarding
+    mesh.injectDecoy(pkt.source, randomHops(2, SAFE_HOPS)); // custom (implement): mirrored maze
     return;
   }
 
