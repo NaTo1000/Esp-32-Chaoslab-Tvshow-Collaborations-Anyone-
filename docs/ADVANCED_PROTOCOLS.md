@@ -210,6 +210,14 @@ Use this when a node appears to be force-seeking addresses or probing like a cyb
 Pseudo-flow for a Meshtastic-style handler:
 
 ```cpp
+const int SAFE_HOPS = 6; // tighten/loosen based on deployment risk
+
+// Placeholder hooks to implement in your firmware
+bool rateExceeded(uint32_t nodeId);
+void quarantine(uint32_t nodeId);
+void injectDecoy(uint32_t nodeId, int hops);
+int randomHops(int minHop, int maxHop);
+
 bool isForceSeek(const MeshPacket& pkt) {
   return pkt.isRouteDiscovery() &&
          (pkt.destination == "ALL" || pkt.hopLimit > SAFE_HOPS) &&

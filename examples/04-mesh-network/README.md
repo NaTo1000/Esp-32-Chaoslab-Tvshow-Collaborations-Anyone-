@@ -328,6 +328,14 @@ Use when a node appears to be force-seeking addresses or probing routes:
 ```cpp
 const int MAX_TRUSTED_HOPS = 6; // tighten/loosen based on deployment
 
+// Placeholder hooks to implement in firmware
+bool rateExceeded(uint32_t nodeId);
+String extractDest(const String& msg);
+int extractHopLimit(const String& msg);
+void quarantine(uint32_t nodeId);
+void injectDecoy(uint32_t nodeId, int hops);
+int randomHops(int minHop);
+
 bool looksLikeForceSeek(uint32_t from, const String& dest, int hopLimit) {
   return (dest == "ALL" || hopLimit > MAX_TRUSTED_HOPS) && rateExceeded(from);
 }
