@@ -210,7 +210,7 @@ Use this when a node appears to be force-seeking addresses or probing like a cyb
 Pseudo-flow for a Meshtastic-style handler:
 
 ```cpp
-// Pseudocode using custom helper wrappers; map to your own Meshtastic packet fields
+// Conceptual pseudocode using custom helper wrappers; map to your own Meshtastic packet fields
 const int SAFE_HOPS = 6; // tighten/loosen based on deployment risk
 const uint32_t BROADCAST_ID = 0xFFFFFFFF; // adjust to your mesh's broadcast constant
 
@@ -222,8 +222,8 @@ int randomHops(int minHop, int maxHop);
 
 bool isForceSeek(const MeshPacket& pkt) {
   return pkt.isRouteDiscovery() &&          // use your packet's route-discovery flag
-         (pkt.destination == BROADCAST_ID || pkt.hopLimit > SAFE_HOPS) &&
-         rateExceeded(pkt.source); // track per-node discovery rate
+         ((pkt.destination == BROADCAST_ID) || (pkt.hopLimit > SAFE_HOPS)) &&
+         rateExceeded(pkt.source);          // track per-node discovery rate
 }
 
 void onMeshPacket(const MeshPacket& pkt) {

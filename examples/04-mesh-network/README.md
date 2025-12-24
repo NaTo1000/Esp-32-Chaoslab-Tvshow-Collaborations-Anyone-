@@ -326,7 +326,9 @@ String signMessage(String msg) {
 Use when a node appears to be force-seeking addresses or probing routes:
 
 ```cpp
-const int MAX_TRUSTED_HOPS = 6; // tighten/loosen based on deployment
+// Conceptual pseudocode; replace custom helpers with your own Meshtastic wrappers
+const int MAX_TRUSTED_HOPS = 6; // tighten for small/private meshes, loosen for long routes
+const String BROADCAST_DEST = "ALL"; // adjust to whatever your payload uses for broadcast
 
 // Placeholder hooks to implement in firmware (custom wrappers; not base Meshtastic API)
 bool rateExceeded(uint32_t nodeId);
@@ -337,7 +339,7 @@ void injectDecoy(uint32_t nodeId, int hops);
 int randomHops(int minHop, int maxHop);
 
 bool looksLikeForceSeek(uint32_t from, const String& dest, int hopLimit) {
-  return (dest == "ALL" || hopLimit > MAX_TRUSTED_HOPS) && rateExceeded(from);
+  return (dest.equals(BROADCAST_DEST) || hopLimit > MAX_TRUSTED_HOPS) && rateExceeded(from);
 }
 
 void receivedCallback(uint32_t from, String &msg) {
