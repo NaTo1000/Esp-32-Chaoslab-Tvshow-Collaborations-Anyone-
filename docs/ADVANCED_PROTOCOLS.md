@@ -212,6 +212,7 @@ Pseudo-flow for a Meshtastic-style handler:
 ```cpp
 // Pseudocode using custom helper wrappers; map to your own Meshtastic packet fields
 const int SAFE_HOPS = 6; // tighten/loosen based on deployment risk
+const uint32_t BROADCAST_ID = 0xFFFFFFFF; // adjust to your mesh's broadcast constant
 
 // Placeholder hooks to implement in your firmware
 bool rateExceeded(uint32_t nodeId);
@@ -221,14 +222,14 @@ int randomHops(int minHop, int maxHop);
 
 bool isForceSeek(const MeshPacket& pkt) {
   return pkt.isRouteDiscovery() &&          // use your packet's route-discovery flag
-         (pkt.destination == "ALL" || pkt.hopLimit > SAFE_HOPS) &&
+         (pkt.destination == BROADCAST_ID || pkt.hopLimit > SAFE_HOPS) &&
          rateExceeded(pkt.source); // track per-node discovery rate
 }
 
 void onMeshPacket(const MeshPacket& pkt) {
   if (isForceSeek(pkt)) {
     mesh.quarantine(pkt.source);          // custom: stop real forwarding
-    mesh.injectDecoy(pkt.source, randomHops(2, 6)); // custom: mirrored maze
+    mesh.injectDecoy(pkt.source, randomHops(2, SAFE_HOPS)); // custom: mirrored maze
     return;
   }
 

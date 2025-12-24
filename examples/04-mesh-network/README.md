@@ -343,8 +343,8 @@ bool looksLikeForceSeek(uint32_t from, const String& dest, int hopLimit) {
 void receivedCallback(uint32_t from, String &msg) {
   // extractDest/extractHopLimit: parse your mesh payload metadata
   if (looksLikeForceSeek(from, extractDest(msg), extractHopLimit(msg))) {
-    mesh.quarantine(from);                         // custom wrapper to block real paths
-    mesh.injectDecoy(from, randomHops(2, MAX_TRUSTED_HOPS)); // custom mirrored maze
+    mesh.quarantine(from);                         // custom extension: block/ACL the node
+    mesh.injectDecoy(from, randomHops(2, MAX_TRUSTED_HOPS)); // custom extension: mirrored maze
     return;
   }
 
