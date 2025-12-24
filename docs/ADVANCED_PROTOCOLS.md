@@ -210,6 +210,7 @@ Use this when a node appears to be force-seeking addresses or probing like a cyb
 Pseudo-flow for a Meshtastic-style handler:
 
 ```cpp
+// Pseudocode using custom helper wrappers; map to your own Meshtastic packet fields
 const int SAFE_HOPS = 6; // tighten/loosen based on deployment risk
 
 // Placeholder hooks to implement in your firmware
@@ -219,15 +220,15 @@ void injectDecoy(uint32_t nodeId, int hops);
 int randomHops(int minHop, int maxHop);
 
 bool isForceSeek(const MeshPacket& pkt) {
-  return pkt.isRouteDiscovery() &&
+  return pkt.isRouteDiscovery() &&          // use your packet's route-discovery flag
          (pkt.destination == "ALL" || pkt.hopLimit > SAFE_HOPS) &&
          rateExceeded(pkt.source); // track per-node discovery rate
 }
 
 void onMeshPacket(const MeshPacket& pkt) {
   if (isForceSeek(pkt)) {
-    mesh.quarantine(pkt.source);          // stop real forwarding
-    mesh.injectDecoy(pkt.source, randomHops(2, 6)); // mirrored maze
+    mesh.quarantine(pkt.source);          // custom: stop real forwarding
+    mesh.injectDecoy(pkt.source, randomHops(2, 6)); // custom: mirrored maze
     return;
   }
 

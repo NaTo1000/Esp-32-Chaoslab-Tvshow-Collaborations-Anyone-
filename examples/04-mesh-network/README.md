@@ -328,13 +328,13 @@ Use when a node appears to be force-seeking addresses or probing routes:
 ```cpp
 const int MAX_TRUSTED_HOPS = 6; // tighten/loosen based on deployment
 
-// Placeholder hooks to implement in firmware
+// Placeholder hooks to implement in firmware (custom wrappers; not base Meshtastic API)
 bool rateExceeded(uint32_t nodeId);
 String extractDest(const String& msg);
 int extractHopLimit(const String& msg);
 void quarantine(uint32_t nodeId);
 void injectDecoy(uint32_t nodeId, int hops);
-int randomHops(int minHop);
+int randomHops(int minHop, int maxHop);
 
 bool looksLikeForceSeek(uint32_t from, const String& dest, int hopLimit) {
   return (dest == "ALL" || hopLimit > MAX_TRUSTED_HOPS) && rateExceeded(from);
@@ -343,8 +343,8 @@ bool looksLikeForceSeek(uint32_t from, const String& dest, int hopLimit) {
 void receivedCallback(uint32_t from, String &msg) {
   // extractDest/extractHopLimit: parse your mesh payload metadata
   if (looksLikeForceSeek(from, extractDest(msg), extractHopLimit(msg))) {
-    mesh.quarantine(from);                 // block real paths
-    mesh.injectDecoy(from, randomHops(2)); // send mirrored maze
+    mesh.quarantine(from);                         // custom wrapper to block real paths
+    mesh.injectDecoy(from, randomHops(2, MAX_TRUSTED_HOPS)); // custom mirrored maze
     return;
   }
 
